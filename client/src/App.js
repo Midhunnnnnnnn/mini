@@ -1,26 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { createBrowserRouter, Outlet, RouterProvider, ScrollRestoration } from 'react-router-dom';
-import { productsData } from './api/Api';
-import Footer from './components/Footer';
-import Header from './components/Header';
-import Product from './components/Product';
-import Home from './Home';
-import Cart from './pages/Cart';
-import Login from './pages/Login';
-import Blog from './components/blog';
-import Shop from './components/shop';
-import { ClipLoader } from 'react-spinners';
+import React, { useState, useEffect, lazy, Suspense } from "react";
+import {
+  createBrowserRouter,
+  Outlet,
+  RouterProvider,
+  ScrollRestoration,
+} from "react-router-dom";
+import { productsData } from "./api/Api";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import { ClipLoader } from "react-spinners";
 
-const Layout = () => {
-  return (
-    <div>
-      <Header />
-      <ScrollRestoration />
-      <Outlet />
-      <Footer />
-    </div>
-  );
-};
+// Lazy load components for better performance
+const Home = lazy(() => import("./Home"));
+const Product = lazy(() => import("./components/Product"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Login = lazy(() => import("./pages/Login"));
+const Blog = lazy(() => import("./components/blog"));
+const Shop = lazy(() => import("./components/shop")); // Original Shop: New Arrivals
+const FakeStoreShop = lazy(() => import("./components/FakeStoreShop")); // New Shop: The Classic
+const Community = lazy(() => import("./components/Community"));
+const HelpAndSupport = lazy(() => import("./components/HelpAndSupport"));
+const ChatbotPage = lazy(() => import("./components/ChatbotPage"));
+const LatestTrends = lazy(() => import("./components/LatestTrends"));
+const SustainableFashion = lazy(() => import("./components/SustainableFashion"));
+const FashionWeekHighlights = lazy(() => import("./components/FashionWeekHighlights"));
+
+// Order Tracking Component
+const OrderTracking = lazy(() => import("./components/OrderTracking"));
+
+const Layout = () => (
+  <div>
+    <Header />
+    <ScrollRestoration />
+    <Outlet />
+    <Footer />
+  </div>
+);
 
 const router = createBrowserRouter([
   {
@@ -29,28 +44,116 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <Home />
+          </Suspense>
+        ),
         loader: productsData,
       },
       {
         path: "/product/:id",
-        element: <Product />,
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <Product />
+          </Suspense>
+        ),
       },
       {
         path: "/cart",
-        element: <Cart />,
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <Cart />
+          </Suspense>
+        ),
       },
       {
         path: "/login",
-        element: <Login />,
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <Login />
+          </Suspense>
+        ),
       },
       {
         path: "/blog",
-        element: <Blog />,
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <Blog />
+          </Suspense>
+        ),
       },
       {
-        path: "/shop",
-        element: <Shop />,
+        path: "/new-arrivals",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <Shop />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/the-classic",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <FakeStoreShop />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/community",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <Community />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/help-and-support",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <HelpAndSupport />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/chatbot",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <ChatbotPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/latest-trends",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <LatestTrends />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/sustainable-fashion",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <SustainableFashion />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/fashion-week-highlights",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <FashionWeekHighlights />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/order-tracking",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <OrderTracking />
+          </Suspense>
+        ),
       },
     ],
   },
@@ -60,54 +163,21 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 4000);
-
+    const timer = setTimeout(() => setLoading(false), 4000);
     return () => clearTimeout(timer);
   }, []);
 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-100 z-50">
+        <ClipLoader color="#36d7b7" loading={loading} size={150} />
+      </div>
+    );
+  }
+
   return (
     <div className="font-bodyFont">
-      {loading && (
-        <div
-          className="fixed top-0 left-0 w-full h-full bg-white flex items-center justify-center z-50"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100vh',
-            backgroundColor: '#f7f7f7',
-            zIndex: 100,
-          }}
-        >
-          <ClipLoader color="#36d7b7" loading={loading} size={150} />
-        </div>
-      )}
       <RouterProvider router={router} />
-
-      <style jsx>{`
-        .loading-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100vh;
-          background-color: #f7f7f7;
-          z-index: 100;
-        }
-
-        .loading-container .ClipLoader {
-          margin: 0 auto;
-        }
-      `}</style>
     </div>
   );
 }

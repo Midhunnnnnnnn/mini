@@ -75,9 +75,9 @@ const Cart = () => {
               <div className="w-full mt-6 flex items-center justify-center">
                 <StripeCheckout
                   stripeKey="pk_test_51LXpmzBcfNkwYgIPXd3qq3e2m5JY0pvhaNZG7KSCklYpVyTCVGQATRH8tTWxDSYOnRTT5gxOjRVpUZmOWUEHnTxD00uxobBHkc"
-                  name="Bazar Online Shopping"
+                name="RAZOR PAY"
                   amount={totalAmt * 100}
-                  label="Pay to bazar"
+                  label="Pay to Future Threads"
                   description={`Your Payment amount is $${totalAmt}`}
                   token={payment}
                   email={userInfo.email}

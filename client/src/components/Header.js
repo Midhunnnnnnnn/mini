@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { cartImg, logoDark } from "../assets/index";
-import axios from "axios";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { cartImg, logoDark, userAvatar } from "../assets/index";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const productData = useSelector((state) => state.bazar.productData);
@@ -15,8 +15,9 @@ const Header = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("https://fakestoreapiserver.reactbd.com/products");
-        setAllProducts(response.data);
+        const response = await fetch("https://fakestoreapiserver.reactbd.com/products");
+        const data = await response.json();
+        setAllProducts(data);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -65,8 +66,8 @@ const Header = () => {
             {searchResults.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border rounded-md mt-1 max-h-60 overflow-y-auto shadow-lg">
                 {searchResults.map(product => (
-                  <div 
-                    key={product.id} 
+                  <div
+                    key={product.id}
                     onClick={() => handleSearchResultClick(product)}
                     className="block p-2 hover:bg-gray-100 cursor-pointer font-serif font-light"
                   >
@@ -78,16 +79,40 @@ const Header = () => {
           </div>
         </div>
         <div className="flex items-center gap-8">
-          <Link to="/" className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer">
+          <Link
+            to="/"
+            className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer"
+          >
             HOME
           </Link>
-          <Link to="/shop" className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer">
-            PRODUCTS
+          <Link
+            to="/new-arrivals"
+            className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer"
+          >
+            NEW ARRIVALS
           </Link>
-          <Link to="/blog" className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer">
+          <Link
+            to="/the-classic"
+            className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer"
+          >
+            THE CLASSIC
+          </Link>
+          <Link
+            to="/blog"
+            className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer"
+          >
             OUR STORY
           </Link>
-          <Link to="/cart">
+          <Link
+            to="/community"
+            className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer"
+          >
+            COMMUNITY
+          </Link>
+          <Link
+            to="/cart"
+            className="text-base text-black font-serif font-light hover:text-orange-900 hover:underline underline-offset-2 decoration-[1px] cursor-pointer"
+          >
             <div className="relative">
               <img className="w-6" src={cartImg} alt="cartImg" />
               <span className="absolute w-6 top-2 left-0 text-sm flex items-center justify-center font-semibold font-titleFont">
@@ -101,7 +126,7 @@ const Header = () => {
               src={
                 userInfo && userInfo.image
                   ? userInfo.image
-                  : "https://img.freepik.com/premium-vector/avatar-man-with-beard-office-worker-wearing-glasses-it-developer-engineer-programmer_277909-144.jpg"
+                  : userAvatar
               }
               alt="userLogo"
             />
