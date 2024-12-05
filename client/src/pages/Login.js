@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   GoogleAuthProvider,
   GithubAuthProvider,
@@ -20,7 +20,11 @@ const Login = () => {
   const auth = getAuth();
   const googleProvider = new GoogleAuthProvider();
   const githubProvider = new GithubAuthProvider();
+  const [isAdmin, setIsAdmin] = useState(false); // Track admin login state
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
 
+  // User Login Handlers
   const handleLogin = (provider) => {
     signInWithPopup(auth, provider.setCustomParameters({ prompt: "select_account" }))
       .then((result) => {
@@ -33,14 +37,16 @@ const Login = () => {
             image: user.photoURL,
           })
         );
-        axios.post('http://localhost:3000/customers', {
-          _id: user.uid,
-          name: user.displayName,
-          email: user.email,
-          image: user.photoURL,
-        }).catch((error) => {
-          console.error('Error storing customer data:', error);
-        });
+        axios
+          .post("http://localhost:3000/customers", {
+            _id: user.uid,
+            name: user.displayName,
+            email: user.email,
+            image: user.photoURL,
+          })
+          .catch((error) => {
+            console.error("Error storing customer data:", error);
+          });
         toast.success("Login Successful!");
         setTimeout(() => {
           navigate("/");
@@ -63,9 +69,33 @@ const Login = () => {
       });
   };
 
+  // Admin Login Handlers
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (userInfo) {
+      toast.error("Please log out of user account to access admin login.");
+      return;
+    }
+
+    if (adminEmail === "midhunsmanoj771@gmail.com" && adminPassword === "1234567890") {
+      setIsAdmin(true);
+      toast.success("Admin Login Successful!");
+      setTimeout(() => {
+        navigate("/admin-dashboard");
+      }, 1500);
+    } else {
+      toast.error("Invalid Admin Credentials!");
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdmin(false);
+    toast.success("Admin Logged Out Successfully!");
+  };
+
   return (
     <div className="w-full flex flex-col items-center justify-center gap-10 py-20">
-      {!userInfo ? (
+      {!userInfo && !isAdmin ? (
         <>
           <div className="w-full flex items-center justify-center gap-10">
             <div
@@ -85,13 +115,45 @@ const Login = () => {
               <span className="text-sm text-gray-900"> Sign in with Github</span>
             </div>
           </div>
+          <div className="w-full flex flex-col items-center justify-center gap-4 mt-10">
+            <h2 className="text-xl font-semibold">Admin Login</h2>
+            <form onSubmit={handleAdminLogin} className="flex flex-col items-center gap-4">
+              <input
+                type="email"
+                placeholder="Admin Email"
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                className="w-60 h-10 px-4 border rounded-md"
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                className="w-60 h-10 px-4 border rounded-md"
+              />
+              <button
+                type="submit"
+                className="bg-black text-white text-base py-2 px-6 rounded-md hover:bg-gray-800 duration-300"
+              >
+                Login as Admin
+              </button>
+            </form>
+          </div>
         </>
-      ) : (
+      ) : userInfo ? (
         <button
           onClick={handleSignOut}
           className="bg-black text-white text-base py-3 px-8 tracking-wide rounded-md hover:bg-gray-800 duration-300"
         >
           Sign Out
+        </button>
+      ) : (
+        <button
+          onClick={handleAdminLogout}
+          className="bg-red-600 text-white text-base py-3 px-8 tracking-wide rounded-md hover:bg-red-800 duration-300"
+        >
+          Logout as Admin
         </button>
       )}
       <ToastContainer

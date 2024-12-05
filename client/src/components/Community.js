@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
-import {sus} from '../assets/index'
+import React, { useState, useEffect } from 'react';
+import { sus } from '../assets/index';
+
 const Community = () => {
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState(() => {
+    // Retrieve saved comments from localStorage on initial load
+    const savedComments = localStorage.getItem('comments');
+    return savedComments ? JSON.parse(savedComments) : [
+      { name: 'Alice', text: 'Sustainability means reducing waste and reusing resources whenever possible!' },
+      { name: 'John', text: 'I love the idea of ethical fashion. It’s time we care about what we wear!' },
+      { name: 'Priya', text: 'For me, sustainability is about leaving a better planet for future generations.' },
+    ];
+  });
+
   const [commentText, setCommentText] = useState('');
   const [userName, setUserName] = useState('');
+
+  // Save comments to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('comments', JSON.stringify(comments));
+  }, [comments]);
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
     if (commentText.trim() && userName.trim()) {
-      setComments([...comments, { name: userName, text: commentText }]);
+      const newComment = { name: userName, text: commentText };
+      setComments([...comments, newComment]);
       setCommentText('');
       setUserName('');
     }
@@ -22,16 +38,11 @@ const Community = () => {
           <strong>Future Threads</strong> is dedicated to promoting sustainability through ethical and eco-friendly fashion.
           By joining us, you’re supporting a movement that values the planet, ethical practices, and a greener tomorrow.
         </p>
-        <img
-  src={sus}
-  alt="Sustainability"
-  className="hero-image"
-/>
-
+        <img src={sus} alt="Sustainability" className="hero-image" />
       </div>
       <div className="content">
         <p>
-          Your voice matters! Share your thoughts, ideas, or personal stories about sustainability in the comments below. 
+          Your voice matters! Share your thoughts, ideas, or personal stories about sustainability in the comments below.
           Let’s work together to inspire change and create a community that believes in making a difference.
         </p>
         <form onSubmit={handleCommentSubmit} className="comment-form">

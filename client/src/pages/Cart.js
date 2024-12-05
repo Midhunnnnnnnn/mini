@@ -12,6 +12,7 @@ const Cart = () => {
   const userInfo = useSelector((state) => state.bazar.userInfo);
   const [payNow, setPayNow] = useState(false);
   const [totalAmt, setTotalAmt] = useState("");
+
   useEffect(() => {
     let price = 0;
     productData.map((item) => {
@@ -28,11 +29,48 @@ const Cart = () => {
       toast.error("Please sign in to Checkout");
     }
   };
+
+  const handleRequest = async () => {
+    if (userInfo) {
+      try {
+        const response = await axios.post("http://localhost:8000/tracking-requests", {
+          user: userInfo.name,
+          email: userInfo.email,
+          message: "Customer has requested assistance with their order.",
+          status: "Pending",
+        });
+
+        if (response.status === 201) {
+          toast.success("Request sent to admin successfully!");
+        }
+      } catch (error) {
+        console.error("Error in sending request:", error);
+        toast.error("Failed to send the request. Please try again.");
+      }
+    } else {
+      toast.error("Please sign in to send a request.");
+    }
+  };
+
   const payment = async (token) => {
-    await axios.post("http://localhost:8000/pay", {
-      amount: totalAmt * 100,
-      token: token,
-    });
+    // Simulate a successful payment
+    try {
+      const response = await axios.post("http://localhost:8000/tracking-requests", {
+        user: userInfo.name,
+        email: userInfo.email,
+        amount: totalAmt,
+        status: "Payment Received",
+        paymentDetails: token.card,
+      });
+
+      if (response.status === 201) {
+        toast.success("Payment successful! Notification sent to admin.");
+        setPayNow(false); // Reset the payment state
+      }
+    } catch (error) {
+      console.error("Error in processing payment:", error);
+      toast.error("An error occurred during payment.");
+    }
   };
 
   return (
@@ -46,7 +84,7 @@ const Cart = () => {
         <div className="max-w-screen-xl mx-auto py-20 flex">
           <CartItem />
           <div className="w-1/3 bg-[#fafafa] py-6 px-4">
-            <div className=" flex flex-col gap-6 border-b-[1px] border-b-gray-400 pb-6">
+            <div className="flex flex-col gap-6 border-b-[1px] border-b-gray-400 pb-6">
               <h2 className="text-2xl font-medium ">Total Amount</h2>
               <p className="flex items-center gap-4 text-base">
                 Subtotal{" "}
@@ -57,25 +95,33 @@ const Cart = () => {
               <p className="flex items-start gap-4 text-base">
                 Shipping{" "}
                 <span>
-                 You will be re-directed to the payment page shortly.
-                 Please enter your adress during payment.
+                  You will be redirected to the payment page shortly. Please enter
+                  your address during payment.
                 </span>
               </p>
             </div>
             <p className="font-titleFont font-semibold flex justify-between mt-6">
               Total <span className="text-xl font-bold">${totalAmt}</span>
             </p>
-            <button
-              onClick={handleCheckout}
-              className="text-base bg-black text-white w-full py-3 mt-6 hover:bg-gray-800 duration-300"
-            >
-              proceed to checkout
-            </button>
+            <div className="mt-6 flex flex-col gap-4">
+              <button
+                onClick={handleCheckout}
+                className="text-base bg-black text-white w-full py-3 hover:bg-gray-800 duration-300"
+              >
+                Proceed to Checkout
+              </button>
+              <button
+                onClick={handleRequest}
+                className="text-base bg-blue-500 text-white w-full py-3 hover:bg-blue-700 duration-300"
+              >
+                Request Assistance
+              </button>
+            </div>
             {payNow && (
               <div className="w-full mt-6 flex items-center justify-center">
                 <StripeCheckout
                   stripeKey="pk_test_51LXpmzBcfNkwYgIPXd3qq3e2m5JY0pvhaNZG7KSCklYpVyTCVGQATRH8tTWxDSYOnRTT5gxOjRVpUZmOWUEHnTxD00uxobBHkc"
-                name="RAZOR PAY"
+                  name="RAZORPAY"
                   amount={totalAmt * 100}
                   label="Pay to Future Threads"
                   description={`Your Payment amount is $${totalAmt}`}
@@ -97,7 +143,7 @@ const Cart = () => {
               <span>
                 <HiOutlineArrowLeft />
               </span>
-              go shopping
+              Go Shopping
             </button>
           </Link>
         </div>

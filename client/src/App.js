@@ -24,9 +24,10 @@ const ChatbotPage = lazy(() => import("./components/ChatbotPage"));
 const LatestTrends = lazy(() => import("./components/LatestTrends"));
 const SustainableFashion = lazy(() => import("./components/SustainableFashion"));
 const FashionWeekHighlights = lazy(() => import("./components/FashionWeekHighlights"));
-
-// Order Tracking Component
 const OrderTracking = lazy(() => import("./components/OrderTracking"));
+
+// Admin Dashboard Component
+const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
 
 const Layout = () => (
   <div>
@@ -152,6 +153,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
             <OrderTracking />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/admin-dashboard",
+        element: (
+          <Suspense fallback={<ClipLoader size={50} color="#36d7b7" />}>
+            <AdminDashboard />
           </Suspense>
         ),
       },
